@@ -25,6 +25,7 @@
         - newrelic-java-3.21.0.zip
         - Export20151011.tar.gz
         - jasperCustom.tar.gz
+
 # installation
     - file: path=/opt/jasperreports-server-6.0.1 state=absent
     - name: install jasper 
@@ -49,8 +50,8 @@
       command: ./opt/jasperreports-server-6.0.1/buildomatic/js-import.sh --input-dir ~/Export20151011
 
 # manually move custom jars
-#    - name: move files to proper location
-#      command: cp -rf ~/jasper/apache-tomcat /opt/jasperreports-server-6.0.1/
+    - name: move files to proper location
+      command: cp -rf ~/jasper/apache-tomcat /opt/jasperreports-server-6.0.1/
 
 # create memory manager
     - copy: cp -f src=tomcat-users.xml dest=/opt/jasperreports-server-6.0.1/apache-tomcat/conf/.
