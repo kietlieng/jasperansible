@@ -1,0 +1,9 @@
+---
+jasper_export: "Export20151011"
+jasper_server_name: "Jasper Production"
+jasper_installer_version: "6.0.1"
+jasper_installer: "jasperreports-server-6.0.1-linux-x64-installer.run"
+jasper_installer_script: "installjasper.sh"
+jasper_license: "jasperserver.license"
+jasper_custom: "jasper"
+newrelic_version: "3.21.0"

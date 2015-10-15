@@ -1,0 +1,69 @@
+---
+- name: yum install common tools
+  yum: name={{item}} state=latest
+  with_items:
+    - '*'
+    - vim 
+    - expect
+    - unzip
+- copy: cp src={{item}} dest=~/
+  with_items:  
+    - "{{ jasper_installer }}"
+    - "{{ jasper_license }}"
+    - "{{ jasper_installer_script }}"
+    - "newrelic-java-{{ newrelic_version }}.zip"
+    - "{{ jasper_export }}.tar.gz"
+    - "{{ jasper_custom }}.tar.gz" 
+
+- file: path=~/{{item}} mode="u+rwx,g+rx,o-rwx"
+  with_items:
+    - "{{ jasper_installer }}"
+    - "{{ jasper_license }}"
+    - "{{ jasper_installer_script }}"
+    - "newrelic-java-{{ newrelic_version }}.zip"
+    - "{{ jasper_export }}.tar.gz"
+    - "{{ jasper_custom }}.tar.gz" 
+
+# import custom files
+- name: untar export
+  command: tar -xzf {{item}}
+  with_items:
+    - "{{ jasper_export }}.tar.gz"
+    - "{{ jasper_custom }}.tar.gz"
+- file: path=~/"{{ jasper_export }}" mode="u+rwx,g+rx,o-rwx"
+
+
+
+# installation
+#- file: path=/opt/jasperreports-server-"{{ jasper_installer_version }}" state=absent
+#- name: install jasper 
+#  command: ~/"{{ jasper_installer_script }}"
+
+
+
+# new relic job
+- name: copy license file to proper directory
+  command: cp ~/"{{ jasper_license }}" /opt/jasperreports-server-"{{ jasper_installer_version }}"/
+
+- name: unzip new relic
+  command: unzip -o newrelic-java-"{{ newrelic_version }}".zip -d /opt/jasperreports-server-"{{ jasper_installer_version }}"/apache-tomcat/
+
+- name: replace name
+  command: "sed -i 's/app_name: My Application/app_name: \"{{ jasper_server_name }}\"/g' /opt/jasperreports-server-6.0.1/apache-tomcat/newrelic/newrelic.yml"
+- name: install new relic 
+  command:  /opt/jasperreports-server-"{{ jasper_installer_version }}"/java/bin/java -jar /opt/jasperreports-server-"{{ jasper_installer_version }}"/apache-tomcat/newrelic/newrelic.jar install
+
+
+
+
+
+#- name: import files
+#  command: ./opt/jasperreports-server-"{{ jasper_installer_version }}"/buildomatic/js-import.sh --input-dir ~/"{{ jasper_export }}"
+
+# manually move custom jars
+- name: move files to proper location
+  command: cp -rf ~/jasper/apache-tomcat /opt/jasperreports-server-"{{ jasper_installer_version }}"/
+
+# create memory manager
+- copy: cp -f src=tomcat-users.xml dest=/opt/jasperreports-server-"{{ jasper_installer_version }}"/apache-tomcat/conf/
+
